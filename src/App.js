@@ -1,24 +1,47 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useState } from "react";
+import axios from "axios";
+
+import Search from "./components/Search";
+import Results from "./components/Results";
 
 function App() {
+  const [state, setState] = useState({
+    s: "",
+    results: [],
+    selected: {}
+  });
+  const apiurl = "http://www.omdbapi.com/?i=tt3896198&apikey=dcce6e1d";
+
+  const search = e => {
+    if (e.key === "Enter") {
+      axios(apiurl + "&s=" + state.s).then(({ data }) => {
+        let results = data.Search;
+
+        setState(prevState => {
+          return { ...prevState, results: results };
+        });
+      });
+    }
+  };
+
+  const handleInput = e => {
+    let s = e.target.value;
+
+    setState(prevState => {
+      return { ...prevState, s: s };
+    });
+  };
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
+      <header>
+        <h1>#StayAtHome</h1>
+        <h2>#WatchMovies</h2>
       </header>
+      <main>
+        <Search handleInput={handleInput} search={search} />
+        <Results results={state.results} />
+      </main>
     </div>
   );
 }
